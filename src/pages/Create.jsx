@@ -1,36 +1,60 @@
-import { useState, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { createTask } from '../redux/features/task.slice';
-import { useGetEmojiQuery } from '../redux/features/emoji.slice'
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-export default function Create() {
-    const [taskName, setTaskName] = useState('');
-    const [taskDetails, setTaskDetails] = useState('');
+import { useNavigate } from "react-router-dom";
 
-    const f = useRef(null);
-    const dispatch = useDispatch();
-    const { data, error, isLoading } = useGetEmojiQuery()
+import { v4 as uuidv4 } from "uuid";
 
-    return <div>
-        <h1>create task</h1>
-        <form ref={f} onSubmit={(e) => {
-            e.preventDefault();
-            dispatch(createTask({ name: taskName, details: taskDetails, isComplete: false, emoji: data ? data.htmlCode[0] : '' }));
-            setTaskName('');
-            setTaskDetails('');
-            f.current.reset();
-        }}>
-            <label htmlFor="taskName">Name</label>
-            <input value={taskName} type="text" name='taskName' onInput={(e) => {
-                setTaskName(e.target.value);
-            }} />
-            <label htmlFor="taskDetails">Details</label>
-            <input value={taskDetails} type="text" name='taskDetails' onInput={(e) => {
-                setTaskDetails(e.target.value);
-            }} />
-            <div>{isLoading ? 'generating emoji' : ''}</div>
-            <div>{error ? error : ''}</div>
-            <button>create</button>
-        </form>
-    </div>;
+import { useGetRandomEmojiQuery } from "../Api/apiSlice";
+import * as toDoActions from "../Redux/toDoItemsSlice";
+
+function Create() {
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const [userInput, setUserInput] = useState("");
+
+  const allToDoItems = useSelector((state) => {
+    return state.items.allToDoItems;
+  });
+
+  const { data, refetch } = useGetRandomEmojiQuery();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newItem = {
+      id: uuidv4(),
+      content: userInput,
+      emoji: data.htmlCode,
+    };
+
+    const updatedItems = [...allToDoItems, newItem];
+    dispatch(toDoActions.setAllToDoItems(updatedItems));
+    setUserInput("");
+    refetch();
+  };
+
+  function handleChange(e) {
+    const value = e.target.value;
+    setUserInput(value);
+  }
+
+  function handleNavigate() {
+    navigate("/read");
+  }
+
+  return (
+    <div>
+      <h2>Please Enter Your Do-To</h2>
+      <form onSubmit={handleSubmit}>
+        <input onChange={handleChange} value={userInput}></input>
+        <button>Create</button>
+      </form>
+      <button onClick={handleNavigate}>To See All Your TO-DO Press Here</button>
+    </div>
+  );
 }
+
+export default Create;

@@ -1,37 +1,86 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { completeTask, updateTask } from '../redux/features/task.slice';
-import sanitizeHtml from 'sanitize-html';
-import { useLazyGetEmojiQuery } from '../redux/features/emoji.slice'
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setCurrentToDoItem } from "../Redux/toDoItemsSlice";
+import { useGetRandomEmojiQuery } from "../Api/apiSlice";
+import * as toDoActions from "../Redux/toDoItemsSlice";
+import { useState } from "react";
 
-export default function Read() {
-    const dispatch = useDispatch();
-    const [trigger, result, lastPromiseInfo] = useLazyGetEmojiQuery();
-    // console.log('lastPromiseInfo', lastPromiseInfo);
-    // console.log('result', result);
-    // console.log('trigger', trigger)
-    const tasks = useSelector((state) => {
-        return state.tasks;
+function Read() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [checkedItems, setCheckedItems] = useState([]);
+  const { refetch } = useGetRandomEmojiQuery();
+
+  const allToDoItems = useSelector((state) => {
+    return state.items.allToDoItems;
+  });
+
+  function setCurrentItem(currentIndex) {
+    dispatch(
+      setCurrentToDoItem({
+        id: allToDoItems[currentIndex].id,
+        content: allToDoItems[currentIndex].content,
+        emoji: allToDoItems[currentIndex].emoji,
+      })
+    );
+  }
+
+  function handleNavigateDelete(indexToDelete) {
+    setCurrentItem(indexToDelete);
+    navigate("/delete");
+  }
+
+  function handleNavigateUpdate(indexToUpdate) {
+    setCurrentItem(indexToUpdate);
+    navigate("/update");
+  }
+
+  function handleCheckboxChange(id) {
+    if (checkedItems.includes(id)) {
+      setCheckedItems(checkedItems.filter((checkedId) => checkedId !== id));
+    } else {
+      setCheckedItems([...checkedItems, id]);
+    }
+
+    refetch().then((result) => {
+      const updatedData = result.data;
+      const itemToUpdateIndex = allToDoItems.findIndex(
+        (item) => item.id === id
+      );
+
+      const allItemsUpdated = [...allToDoItems];
+      allItemsUpdated[itemToUpdateIndex] = {
+        ...allToDoItems[itemToUpdateIndex],
+        emoji: updatedData.htmlCode,
+      };
+
+      dispatch(toDoActions.setAllToDoItems(allItemsUpdated));
     });
-    return (<div>
-        <h1>read page</h1>
-        <h4>tasks:</h4>
-        <div>{tasks.map(task => {
-            return <div key={task.name} style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ textDecoration: !task.isComplete ? 'none' : 'line-through' }}>name: {task.name}</div>
-                <div>details: {task.details}</div>
-                <span role='img' dangerouslySetInnerHTML={{ __html: sanitizeHtml(task.emoji) }}></span>
-                <div style={{ display: 'flex', margin: 'auto' }}>
-                    <label htmlFor="isComplete">Is Done?</label>
-                    <input type="checkbox" name="isComplete" id="isComplete" checked={task.isComplete} onChange={async () => {
-                        const newRes = await trigger();
-                        const updatedTask = { ...task, emoji: newRes.data.htmlCode[0] };
-                        dispatch(updateTask(updatedTask))
-                        dispatch(completeTask({ name: task.name }));
+  }
 
-                    }} />
-                </div>
-                <hr />
-            </div>
-        })}</div>
-    </div>);
+  return (
+    <div>
+      All Your To-Do`s
+      <div>
+        {allToDoItems?.map((item, index) => (
+          <p key={item.id}>
+            <span className={checkedItems.includes(item.id) ? "isChecked" : ""}>
+              {item.content}
+            </span>
+            <span dangerouslySetInnerHTML={{ __html: item.emoji }}></span>
+            <button onClick={() => handleNavigateDelete(index)}>delete</button>
+            <button onClick={() => handleNavigateUpdate(index)}>update</button>
+            <input
+              type="checkbox"
+              checked={checkedItems.includes(item.id)}
+              onChange={() => handleCheckboxChange(item.id)}
+            />
+          </p>
+        ))}
+      </div>
+    </div>
+  );
 }
+
+export default Read;

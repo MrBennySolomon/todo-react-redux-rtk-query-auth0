@@ -1,48 +1,25 @@
-import './App.css';
-import {
-  createBrowserRouter,
-  Outlet,
-  RouterProvider,
-} from "react-router-dom";
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Create from './pages/Create';
-import Read from './pages/Read';
-import Delete from './pages/Delete';
-import Update from './pages/Update';
-
+import "./index.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Header from "./Components/Header";
+import Create from "./Pages/Create";
+import Delete from "./Pages/Delete";
+import Read from "./Pages/Read";
+import Update from "./Pages/Update";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Home />,
+      element: <Header />,
       children: [
-        {
-          path: "/create",
-          element: <Create />,
-        },
-        {
-          path: "/read",
-          element: <Read />,
-        },
-        {
-          path: "/update",
-          element: <Update />,
-        },
-        {
-          path: "/delete",
-          element: <Delete />,
-        },
-      ]
+        { path: "/create", element: <Create /> },
+        { path: "/read", element: <Read /> },
+        { path: "/update", element: <Update /> },
+        { path: "/delete", element: <Delete /> },
+      ],
     },
   ]);
-  return (
-    <RouterProvider router={router}>
-      <Navbar />
-      <Outlet />
-    </RouterProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

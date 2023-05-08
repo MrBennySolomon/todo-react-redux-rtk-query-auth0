@@ -1,12 +1,26 @@
-export default function Delete() {
-    return <div>
-        <h1>delete task</h1>
-        <form action="#">
-            <label htmlFor="taskName">Name</label>
-            <input type="text" name='taskName' />
-            <label htmlFor="id">id</label>
-            <input type="number" name='id' />
-            <button>delete</button>
-        </form>
-    </div>;
+import { useSelector, useDispatch } from "react-redux";
+import * as toDoActions from "../Redux/toDoItemsSlice";
+
+function Delete() {
+  const dispatch = useDispatch();
+
+  // Get currentToDoItem from the store
+  const currentToDoItem = useSelector((state) => state.items.currentToDoItem);
+
+  function handleDelete() {
+    dispatch(toDoActions.deleteToDoItem(currentToDoItem.id));
+  }
+
+  return (
+    <div>
+      To-Do`s You Would like to Delete
+      <p>{currentToDoItem.id}</p>
+      {currentToDoItem.content}
+      <div>
+        <button onClick={handleDelete}>Yes i want to delete this item</button>
+      </div>
+    </div>
+  );
 }
+
+export default Delete;
