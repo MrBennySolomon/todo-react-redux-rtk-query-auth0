@@ -1,39 +1,31 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import { useNavigate } from "react-router-dom";
-
-import { v4 as uuidv4 } from "uuid";
-
-import { useGetRandomEmojiQuery } from "../Api/apiSlice";
 import * as toDoActions from "../Redux/toDoItemsSlice";
+import { useMutation } from "@reduxjs/toolkit/query";
+import { apiSlice } from "../Api/apiSlice";
 
 function Create() {
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
-
   const [userInput, setUserInput] = useState("");
-
-  const allToDoItems = useSelector((state) => {
-    return state.items.allToDoItems;
-  });
-
-  const { data, refetch } = useGetRandomEmojiQuery();
+  const [addTodo] = useMutation(apiSlice.endpoints.addTodo);
+  const allToDoItems = useSelector((state) => {return state.items.allToDoItems;});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newItem = {
-      id: uuidv4(),
-      content: userInput,
-      emoji: data.htmlCode,
+      name: userInput,
+      isDone: false,
     };
 
     const updatedItems = [...allToDoItems, newItem];
-    dispatch(toDoActions.setAllToDoItems(updatedItems));
+    dispatch(toDoActions.addToDoItem(updatedItems));
+
+    await addTodo(newItem).unwrap(); // call the addTodo endpoint with the todo data
+
     setUserInput("");
-    refetch();
   };
 
   function handleChange(e) {

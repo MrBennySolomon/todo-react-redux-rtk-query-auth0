@@ -1,29 +1,32 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCurrentToDoItem } from "../Redux/toDoItemsSlice";
-import { useGetRandomEmojiQuery } from "../Api/apiSlice";
 import * as toDoActions from "../Redux/toDoItemsSlice";
 import { useState } from "react";
+import { useMutation } from "@reduxjs/toolkit/query";
+import { apiSlice } from "../Api/apiSlice";
 
 function Read() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [getTodos] = useMutation(apiSlice.endpoints.getTodos);
   const [checkedItems, setCheckedItems] = useState([]);
-  const { refetch } = useGetRandomEmojiQuery();
 
   const allToDoItems = useSelector((state) => {
     return state.items.allToDoItems;
   });
 
-  function setCurrentItem(currentIndex) {
+  async function setCurrentItem(currentIndex) {
+
     dispatch(
       setCurrentToDoItem({
         id: allToDoItems[currentIndex].id,
         content: allToDoItems[currentIndex].content,
-        emoji: allToDoItems[currentIndex].emoji,
       })
     );
+
+    await getTodos().unwrap(); // call the addTodo endpoint with the todo data
   }
 
   function handleNavigateDelete(indexToDelete) {
@@ -42,21 +45,7 @@ function Read() {
     } else {
       setCheckedItems([...checkedItems, id]);
     }
-
-    refetch().then((result) => {
-      const updatedData = result.data;
-      const itemToUpdateIndex = allToDoItems.findIndex(
-        (item) => item.id === id
-      );
-
-      const allItemsUpdated = [...allToDoItems];
-      allItemsUpdated[itemToUpdateIndex] = {
-        ...allToDoItems[itemToUpdateIndex],
-        emoji: updatedData.htmlCode,
-      };
-
-      dispatch(toDoActions.setAllToDoItems(allItemsUpdated));
-    });
+      dispatch(toDoActions.getAllToDoItems());
   }
 
   return (

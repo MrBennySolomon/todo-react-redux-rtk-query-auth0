@@ -1,14 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import toDoItemsSlice from "./toDoItemsSlice";
-import { emojiApi } from "../Api/apiSlice";
+import { apiSlice } from "../Api/apiSlice";
 
 const store = configureStore({
   reducer: {
     items: toDoItemsSlice,
-    [emojiApi.reducerPath]: emojiApi.reducer,
+    [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(emojiApi.middleware);
+    return getDefaultMiddleware().concat(apiSlice.middleware);
   },
 });
 

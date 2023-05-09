@@ -1,14 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
+import { useMutation } from "@reduxjs/toolkit/query";
+import { apiSlice } from "../Api/apiSlice";
 import * as toDoActions from "../Redux/toDoItemsSlice";
-import { useGetRandomEmojiQuery } from "../Api/apiSlice";
 
 function Update() {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
-  const { data, refetch } = useGetRandomEmojiQuery();
+  const [updateTodo] = useMutation(apiSlice.endpoints.updateTodo);
 
   // Get currentToDoItem from the store
   const currentToDoItem = useSelector((state) => state.items.currentToDoItem);
@@ -30,9 +31,8 @@ function Update() {
     e.preventDefault();
 
     const updatedItem = {
-      id: currentToDoItem.id,
-      content,
-      emoji: data.htmlCode,
+      name: currentToDoItem.name,
+      isDone: currentToDoItem.isDone
     };
 
     const itemToUpdateIndex = allToDoItems.findIndex(
@@ -43,10 +43,10 @@ function Update() {
 
     allItemsUpdated[itemToUpdateIndex] = updatedItem;
 
-    dispatch(toDoActions.setAllToDoItems(allItemsUpdated));
+    dispatch(toDoActions.editToDoItems(allItemsUpdated));
     dispatch(toDoActions.setCurrentToDoItem({}));
+    await updateTodo(updatedItem).unwrap(); // call the addTodo endpoint with the todo data
 
-    refetch();
     setContent("");
   };
 
