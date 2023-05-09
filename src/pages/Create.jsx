@@ -2,14 +2,13 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as toDoActions from "../Redux/toDoItemsSlice";
-import { useMutation } from "@reduxjs/toolkit/query";
-import { apiSlice } from "../Api/apiSlice";
+import { useAddTodoMutation } from "../Api/apiSlice";
 
 function Create() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userInput, setUserInput] = useState("");
-  const [addTodo] = useMutation(apiSlice.endpoints.addTodo);
+  const [addTodo] = useAddTodoMutation();
   const allToDoItems = useSelector((state) => {return state.items.allToDoItems;});
 
   const handleSubmit = async (e) => {

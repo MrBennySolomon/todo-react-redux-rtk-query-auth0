@@ -1,16 +1,14 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setCurrentToDoItem } from "../Redux/toDoItemsSlice";
 import * as toDoActions from "../Redux/toDoItemsSlice";
 import { useState } from "react";
-import { useMutation } from "@reduxjs/toolkit/query";
-import { apiSlice } from "../Api/apiSlice";
+import { useGetTodosQuery } from "../Api/apiSlice";
 
 function Read() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [getTodos] = useMutation(apiSlice.endpoints.getTodos);
+  const [getTodos] = useGetTodosQuery();
   const [checkedItems, setCheckedItems] = useState([]);
 
   const allToDoItems = useSelector((state) => {
@@ -19,12 +17,7 @@ function Read() {
 
   async function setCurrentItem(currentIndex) {
 
-    dispatch(
-      setCurrentToDoItem({
-        id: allToDoItems[currentIndex].id,
-        content: allToDoItems[currentIndex].content,
-      })
-    );
+    dispatch(toDoActions.getAllToDoItems);
 
     await getTodos().unwrap(); // call the addTodo endpoint with the todo data
   }

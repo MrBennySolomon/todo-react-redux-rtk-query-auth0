@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useMutation } from "@reduxjs/toolkit/query";
-import { apiSlice } from "../Api/apiSlice";
+import { useUpdateTodoMutation } from "../Api/apiSlice";
 import * as toDoActions from "../Redux/toDoItemsSlice";
 
 function Update() {
   const dispatch = useDispatch();
 
   const [content, setContent] = useState("");
-  const [updateTodo] = useMutation(apiSlice.endpoints.updateTodo);
+  const [updateTodo] = useUpdateTodoMutation();
 
   // Get currentToDoItem from the store
   const currentToDoItem = useSelector((state) => state.items.currentToDoItem);

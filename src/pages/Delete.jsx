@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from "react-redux";
 import * as toDoActions from "../Redux/toDoItemsSlice";
-import { useMutation } from "@reduxjs/toolkit/query";
-import { apiSlice } from "../Api/apiSlice";
+import { useDeleteTodoMutation } from "../Api/apiSlice";
+
 
 function Delete() {
   const dispatch = useDispatch();
-  const [deleteTodo] = useMutation(apiSlice.endpoints.deleteTodo);
+  const [deleteTodo] = useDeleteTodoMutation();
 
   // Get currentToDoItem from the store
   const currentToDoItem = useSelector((state) => state.items.currentToDoItem);
