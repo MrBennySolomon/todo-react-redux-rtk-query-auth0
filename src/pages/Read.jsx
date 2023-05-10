@@ -19,11 +19,11 @@ function Read() {
   async function setCurrentItem(currentIndex) {
 
     dispatch(toDoActions.getAllToDoItems);
-
     await getTodos().unwrap(); // call the addTodo endpoint with the todo data
   }
 
   function handleNavigateDelete(indexToDelete) {
+    
     setCurrentItem(indexToDelete);
     navigate("/delete");
   }

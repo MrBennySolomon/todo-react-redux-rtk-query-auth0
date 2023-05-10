@@ -34,6 +34,9 @@ function Update() {
       isDone: currentToDoItem.isDone
     };
 
+    localStorage.setItem("operation", "Updata");
+    localStorage.setItem("todoItem", JSON.stringify(updatedItem));
+
     const itemToUpdateIndex = allToDoItems.findIndex(
       (item) => item.id === updatedItem.id
     );

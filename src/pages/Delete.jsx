@@ -11,6 +11,9 @@ function Delete() {
   const currentToDoItem = useSelector((state) => state.items.currentToDoItem);
 
   async function handleDelete() {
+    localStorage.setItem("operation", "Delete");
+    localStorage.setItem("todoItem", JSON.stringify(currentToDoItem));
+
     dispatch(toDoActions.deleteToDoItem(currentToDoItem.id));
     await deleteTodo(currentToDoItem).unwrap(); // call the addTodo endpoint with the todo data
   }

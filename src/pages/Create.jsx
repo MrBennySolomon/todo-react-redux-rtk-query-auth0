@@ -14,10 +14,14 @@ function Create() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    localStorage.setItem("operation", "Add");
+
     const newItem = {
       name: userInput,
       isDone: false,
     };
+
+    localStorage.setItem("todoItem", JSON.stringify(newItem));
 
     const updatedItems = [...allToDoItems, newItem];
     dispatch(toDoActions.addToDoItem(updatedItems));
